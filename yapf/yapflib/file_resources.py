@@ -32,6 +32,25 @@ LF = '\n'
 CRLF = '\r\n'
 
 
+def _getExcludePatternsFromFile(filename):
+  ignore_patterns = []
+  # See if we have a .yapfignore file.
+  if os.path.isfile(filename) and os.access(filename, os.R_OK):
+    for line in open(filename, 'r').read().splitlines():
+      if line.strip() and not line.startswith('#'):
+        ignore_patterns.append(line.strip())
+
+    if any(e.startswith('./') for e in ignore_patterns):
+      raise errors.YapfError("path in ignorefile should not start with ./")
+
+  return ignore_patterns
+
+
+def GetExcludePatternsForDir(dirname):
+  ignore_file = os.path.join(dirname, '.yapfignore')
+  return _getExcludePatternsFromFile(ignore_file)
+
+
 def GetDefaultStyleForDir(dirname):
   """Return default style name for a given directory.
 

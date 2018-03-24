@@ -26,6 +26,30 @@ from yapf.yapflib import py3compat
 from yapftests import utils
 
 
+class GetExcludePatternsForDir(unittest.TestCase):
+
+  def setUp(self):
+    self.test_tmpdir = tempfile.mkdtemp()
+
+  def tearDown(self):
+    shutil.rmtree(self.test_tmpdir)
+
+  def _make_test_dir(self, name):
+    fullpath = os.path.normpath(os.path.join(self.test_tmpdir, name))
+    os.makedirs(fullpath)
+    return fullpath
+
+  def test_get_exclude_file_patterns(self):
+    local_ignore_file = os.path.join(self.test_tmpdir, '.yapfignore')
+    ignore_patterns = ['temp/**/*.py', 'temp2/*.py']
+    with open(local_ignore_file, 'w') as f:
+      f.writelines('\n'.join(ignore_patterns))
+
+    self.assertEqual(
+        sorted(file_resources.GetExcludePatternsForDir(self.test_tmpdir)),
+        sorted(ignore_patterns))
+
+
 class GetDefaultStyleForDirTest(unittest.TestCase):
 
   def setUp(self):
